@@ -1,7 +1,6 @@
 use serde::Deserialize;
 
-
-// all structs are from https://api.github.com/licenses
+// https://api.github.com/licenses
 #[derive(Debug, Deserialize)]
 pub struct License {
     pub key: String,
@@ -22,30 +21,45 @@ pub struct LicenseContent {
     pub body: String,
 }
 
+impl LicenseContent {
+    pub fn fetch_license_content(url: &String) -> LicenseContent {
+        let license: LicenseContent = match ureq::get(&url).call() {
+            Ok(res) => res.into_json().unwrap(),
+            Err(error) => panic!("Unable to fetch license content: {}", error),
+        };
 
-
-impl LicenseContent  {
-pub fn fetch_license_content(url:&String) -> LicenseContent {
-    let license:LicenseContent = match ureq::get(&url).call() {
-        Ok(res) => res.into_json().unwarp(),
-        Err(error) => panic!("Unable to fetch lice contet :{}",error)
-    };
-    license
+        license
+    }
 }
-}
 
-
-
-#[drive(Debug,Deserialize)] 
+#[derive(Debug, Deserialize)]
 pub struct Licenses {
-    pub licenses:Vec<License>,
-}
-impl License { 
-
-pub fn fetch_licenses()  -> Licenses {
-
-    let body :Vec<license>= match ureq::get("")
+    pub license: Vec<License>,
 }
 
+impl Licenses {
+    pub fn fetch_licenses() -> Licenses {
+        let body: Vec<License> = match ureq::get("https://api.github.com/licenses").call() {
+            Ok(res) => res.into_json().unwrap(),
+            Err(error) => panic!("Unable to fetch licenses: {}", error),
+        };
 
+        Licenses { license: body }
+    }
+
+    pub fn get_license_names(&self) -> Vec<String> {
+        self.license.iter().map(|l| String::from(&l.name)).collect()
+    }
+
+    pub fn get_license_from_name(&self, name: &String) -> LicenseContent {
+        let lic = &self.license;
+
+        let result = lic
+            .into_iter()
+            .filter(|l| l.name == name.clone())
+            .map(|l| l.url.clone())
+            .collect();
+
+        LicenseContent::fetch_license_content(&result)
+    }
 }
