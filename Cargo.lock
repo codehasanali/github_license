@@ -116,6 +116,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "gl"
+version = "0.1.0"
+dependencies = [
+ "dialoguer",
+ "serde",
+ "ureq",
+]
+
+[[package]]
 name = "idna"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -240,15 +249,6 @@ dependencies = [
  "untrusted",
  "web-sys",
  "winapi",
-]
-
-[[package]]
-name = "rust_tools"
-version = "0.1.0"
-dependencies = [
- "dialoguer",
- "serde",
- "ureq",
 ]
 
 [[package]]
